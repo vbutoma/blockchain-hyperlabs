@@ -55,12 +55,12 @@ const fields = [
     {
         id: 2,
         name: "Grass2",
-        desc: "The field with green-green grass and flowers"
+        description: "The field with green-green grass and flowers"
     },
     {
         id: 2,
         name: "Grass3",
-        desc: "The grass field near the lake"
+        description: "The grass field near the lake"
     }
 ];
 

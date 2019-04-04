@@ -17,93 +17,123 @@ class AnimalNetwork extends Contract {
         // Participants: Farmer, Regulator
         // Assets: Animal, Business, Field
         // Transactions: createAnimal, moveAnimal, updateAnimal
-        const cars = [
-            {
-                color: 'blue',
-                make: 'Toyota',
-                model: 'Prius',
-                owner: 'Tomoko',
-            },
-            {
-                color: 'blue',
-                make: 'Toyota',
-                model: 'Prius',
-                owner: 'Tomoko',
-            }
-        ];
+        console.info("TEMP MESSAGE");
         for (const [k, v] of Object.entries(defaultDB)) {
             if (initializable.includes(k)) {
                 console.info(k, v);
+                const className = k.endsWith('s') ? k.slice(0, -1) : k;
+                console.log('Classname', className);
+                // k - Class (animal, user, field),
+                for (let i = 0; i < v.length; i++) {
+                    await ctx.stub.putState(`${className}_${i}`, Buffer.from(JSON.stringify(v[i])));
+                    console.info('Added <--> ', v[i]);
+                }
             }
-        }
-
-        for (let i = 0; i < cars.length; i++) {
-            cars[i].docType = 'car';
-            await ctx.stub.putState('CAR' + i, Buffer.from(JSON.stringify(cars[i])));
-            console.info('Added <--> ', cars[i]);
         }
         console.info('============= END : Initialize Ledger ===========');
     }
 
     async queryObject(ctx, id) {
-        return  1;
-    }
-
-
-    async queryCar(ctx, carNumber) {
-        const carAsBytes = await ctx.stub.getState(carNumber); // get the car from chaincode state
-        if (!carAsBytes || carAsBytes.length === 0) {
-            throw new Error(`${carNumber} does not exist`);
+        const bytes = await ctx.stub.getState(id); // get the car from chaincode state
+        if (!bytes || bytes.length === 0) {
+            throw new Error(`${bytes} does not exist`);
         }
-        console.log(carAsBytes.toString());
-        return carAsBytes.toString();
+        console.log(bytes.toString());
+        return bytes.toString();
     }
 
-    async createCar(ctx, carNumber, make, model, color, owner) {
-        console.info('============= START : Create Car ===========');
+    async queryAnimal(ctx, id) {
+        return this.queryObject(ctx, id);
+    }
 
-        const car = {
-            color,
-            docType: 'car',
-            make,
-            model,
-            owner,
+    async queryField(ctx, id) {
+        return this.queryObject(ctx, id);
+    }
+
+    async queryUser(ctx, id) {
+        return this.queryObject(ctx, id);
+    }
+
+    async createObject(ctx, type, args) {
+        let creationPromise = () => Promise.reject('Unknown object type');
+        switch (type) {
+            case "user": creationPromise = this.createUser; break;
+            case "animal": creationPromise = this.createAnimal; break;
+            case "field": creationPromise = this.createField; break;
+            default:
+                break;
+        }
+        try {
+            const id = await creationPromise(ctx, ...args);
+        }
+        catch (e) {
+            console.log(`Can't create object of type: ${type} with ${args}. Reason: ${e}`);
+            return;
+        }
+        return id;
+    }
+
+
+    async createUser(ctx, name, email) {
+        console.info('============= START : Create User ===========');
+        console.info('============= END : Create User ===========');
+    }
+
+    async createAnimal(ctx, type, pType, ownerId, status, fieldId) {
+        console.info('============= START : Create Animal ===========');
+        console.info('============= END : Create Animal ===========');
+    }
+
+    async createField(ctx, name, description) {
+        console.info('============= START : Create Field ===========');
+        const field = {
+            name,
+            description,
         };
-
-        await ctx.stub.putState(carNumber, Buffer.from(JSON.stringify(car)));
-        console.info('============= END : Create Car ===========');
+        // todo: gen Id
+        const id = await ctx.stub.putState(carNumber, Buffer.from(JSON.stringify(car)));
+        console.info('============= END : Create Field ===========');
+        return id;
     }
 
-    async queryAllCars(ctx) {
+
+    async queryAll(ctx) {
         const startKey = 'CAR0';
         const endKey = 'CAR999';
 
         const iterator = await ctx.stub.getStateByRange(startKey, endKey);
-
+        const querable = ['user', 'animal', 'field'];
         const allResults = [];
-        while (true) {
-            const res = await iterator.next();
+        for (let q of querable) {
+            const startKey = `${q}_0`;
+            const endKey = `${q}_999`;
+            const iterator = await ctx.stub.getStateByRange(startKey, endKey);
+            // const iterator = await ctx.stub.getStateByPartialCompositeKey(q, []);
+            while (true) {
+                const res = await iterator.next();
+                if (res.value && res.value.value.toString()) {
+                    console.log(res.value.value.toString('utf8'));
 
-            if (res.value && res.value.value.toString()) {
-                console.log(res.value.value.toString('utf8'));
-
-                const Key = res.value.key;
-                let Record;
-                try {
-                    Record = JSON.parse(res.value.value.toString('utf8'));
-                } catch (err) {
-                    console.log(err);
-                    Record = res.value.value.toString('utf8');
+                    const Key = res.value.key;
+                    let Record;
+                    try {
+                        Record = JSON.parse(res.value.value.toString('utf8'));
+                    } catch (err) {
+                        console.log(err);
+                        Record = res.value.value.toString('utf8');
+                    }
+                    allResults.push({ Key, Record });
                 }
-                allResults.push({ Key, Record });
+                if (res.done) {
+                    console.log('end of data');
+                    break;
+                    await iterator.close();
+                }
             }
-            if (res.done) {
-                console.log('end of data');
-                await iterator.close();
-                console.info(allResults);
-                return JSON.stringify(allResults);
-            }
+            await iterator.close();
         }
+        console.info(allResults);
+        return JSON.stringify(allResults);
     }
 
     async changeCarOwner(ctx, carNumber, newOwner) {

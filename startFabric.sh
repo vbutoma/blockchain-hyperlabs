@@ -4,7 +4,7 @@ set -e
 export MSYS_NO_PATHCONV=1
 starttime=$(date +%s)
 
-CC_PROJECT_NAME=${1:-"fabcar"}
+CC_PROJECT_NAME=${1:-"carfab"}
 CC_RUNTIME_LANGUAGE=node
 CC_SRC_PATH=/opt/gopath/src/github.com/${CC_PROJECT_NAME}
 
