@@ -1,0 +1,54 @@
+<label>name:
+  <input [(ngModel)]="farmerName" placeholder="name"/>
+  <button (click)="changeName(farmerName)">Change Farmer</button>
+</label>
+
+
+
+<h3>Your animals:</h3>
+<h4>
+<li *ngFor="let animal of animals">
+  AnimalId: {{ animal.id }};
+  AnimalOwner: {{ animal.ownerId }};
+  {{ animalInfo(animal) }}
+</li>
+</h4>
+
+<h3>Your fields:</h3>
+<h4>
+<li *ngFor="let field of fields">
+  FieldId: {{ field.id }};
+  FieldName: {{ field.name }};
+  FieldDescription: {{ field.description }};
+  Owner: {{ field.ownerId }};
+  Business: {{ field.businessId }};
+</li></h4>
+
+<h3>Your transactions:</h3>
+New animal movement:
+<label>Farmer1:
+  <input [(ngModel)]="farmerName" placeholder="name" readonly/>
+</label>
+<label>Farmer2:
+  <input [(ngModel)]="f2" placeholder="name"/>
+</label>
+<label>Regulator:
+  <input [(ngModel)]="regulator" placeholder="name"/>
+</label>
+<label>Animal Id:
+  <input [(ngModel)]="animalId" placeholder="name"/>
+</label>
+<button (click)="createMovement(farmerName, f2, regulator, animalId)">Create</button>
+
+<h4>
+<li *ngFor="let movement of movements">
+  {{ movement.mId }}
+  {{ movement.firstFarmerId }}
+  {{ movement.secondFarmerId }}
+  {{ movement.regulatorId }}
+  {{ movement.animalId }}
+  {{ moveInfo(movement)}}
+  <button (click)="approveMovement(farmerName, movement.mId)">Approve</button>
+</li>
+</h4>
+
