@@ -1,17 +1,22 @@
 #!/usr/bin/env bash
 
-cd dev-servers
+PROJECT_NAME=${1:-"carfab"}
+FORCE=${2:-false}
 
-./stopFabric.sh
+echo $PROJECT_NAME
+echo $FORCE
 
-sleep 1
+if [[ $FORCE = true ]]; then
+    ./downFabric.sh $PROJECT_NAME
+    sleep 1
+fi
 
-pkill composer-playground
-rm -rf ~/.composer
+./startFabric.sh $PROJECT_NAME
 
-./teardownFabric.sh
+sleep 2
 
-sleep 1
+# remove wallet folder content
+rm -r wallet/*
 
-./startFabrics.sh
-./createPeerAdminCard.sh
+node app/enrollAdmin.js
+node app/registerUsers.js

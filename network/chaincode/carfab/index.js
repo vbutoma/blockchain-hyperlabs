@@ -1,10 +1,6 @@
-/*
- * SPDX-License-Identifier: Apache-2.0
- */
-
 'use strict';
 
-const AnimalNetwork = require('./lib/fabcar');
+const AnimalNetwork = require('./lib/animalNetwork');
 
 module.exports.AnimalNetwork = AnimalNetwork;
 module.exports.contracts = [ AnimalNetwork ];

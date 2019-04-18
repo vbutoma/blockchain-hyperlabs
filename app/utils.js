@@ -15,15 +15,18 @@ function getCert() {
 
 function getWallet() {
     // Create a new file system based wallet for managing identities.
-    const walletPath = path.join(process.cwd(), 'wallet');
+    const walletPath = "/home/vitaly/MINE/blockchain-hyperlabs/wallet";
     const wallet = new FileSystemWallet(walletPath);
     console.log(`Wallet path: ${walletPath}`);
     return wallet;
 }
 
-
-
+//todo: remove hardcode
+const { animalType, productionType, animalStatus } = require('../network/chaincode/carfab/lib/enums');
 module.exports = {
     getCert,
-    getWallet
+    getWallet,
+    animalType,
+    productionType,
+    animalStatus
 };

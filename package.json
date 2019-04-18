@@ -16,7 +16,9 @@
     "license": "Apache-2.0",
     "dependencies": {
         "fabric-ca-client": "~1.4.0",
-        "fabric-network": "~1.4.0"
+        "fabric-network": "~1.4.0",
+        "hapi": "^18.1.0",
+        "hapi-cors-headers": "^1.0.3"
     },
     "devDependencies": {
         "chai": "^4.2.0",

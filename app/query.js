@@ -1,12 +1,14 @@
-/*
+ /*
  * SPDX-License-Identifier: Apache-2.0
  */
 
 'use strict';
 
+
 const { FileSystemWallet, Gateway } = require('fabric-network');
 
 const utils = require('./utils');
+const { animalType, productionType, animalStatus } = require('./utils');
 const ccp = utils.getCert();
 
 async function main() {
@@ -35,11 +37,16 @@ async function main() {
 
         // Evaluate the specified transaction.
         // queryCar transaction - requires 1 argument, ex: ('queryCar', 'CAR4')
-        // queryAllCars transaction - requires no arguments, ex: ('queryAllCars')
-        // const result = await contract.evaluateTransaction('queryAllCars');
-        const result = await contract.evaluateTransaction('queryAll');
-        console.log(`Transaction has been evaluated, result is: ${result.toString()}`);
 
+        // const result = await contract.evaluateTransaction('queryAll');
+        // const result = await contract.evaluateTransaction('queryAll');
+        // const result = await contract.evaluateTransaction('queryAnimal', '7');
+        // const result = await contract.evaluateTransaction('queryObject', 'field', '1');
+        //
+        let params = ['7', animalType.PIG, productionType.OTHER, '2', animalStatus.IN_TRANSIT];
+        const result = await contract.submitTransaction('createAnimal', ...params);
+        console.log(`Transaction has been evaluated, result is: ${result.toString()}`);
+        process.exit(0);
     } catch (error) {
         console.error(`Failed to evaluate transaction: ${error}`);
         process.exit(1);
