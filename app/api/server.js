@@ -34,6 +34,7 @@ const init = async () => {
         handler: (req, h) => {
             return new Promise((resolve, reject) => {
                 const userId = req.query.id;
+                console.log(userId)
                 const transactions = ['getUserAnimals', 'getUserFields', 'getUserMovements'];
                 const tasks = transactions.map((x) => fetchData(userId, x, [userId]));
                 return Promise.all(tasks)
@@ -64,8 +65,8 @@ const init = async () => {
                     'secondFarmerId': p.secondFarmerId,
                     'animalId': p.animalId,
                     'regulatorId': p.regulatorId,
-                    'status': '1',
-                    'info': 'waiting'
+                    'status': p.status,
+                    'info': p.info
                 };
                 console.log(JSON.stringify(body));
                 const transactions = ['createMovement'];
@@ -73,7 +74,7 @@ const init = async () => {
                 return Promise.all(tasks)
                     .then((res) => {
                         mCnt += 1;
-                        resolve(res);
+                        resolve(`movement_${mCnt-1}`);
                     })
                     .catch((err) => {
                         console.log(err);
@@ -90,14 +91,15 @@ const init = async () => {
             return new Promise((resolve, reject) => {
                 const p = req.payload || {};
                 const userId = p.firstFarmerId;
+                const id = +p.mId.split('_')[1];
                 const body = {
-                    'id': mCnt,
+                    'id': id,
                     'firstFarmerId': p.firstFarmerId,
                     'secondFarmerId': p.secondFarmerId,
                     'animalId': p.animalId,
                     'regulatorId': p.regulatorId,
-                    'status': '0', // todo
-                    'info': 'waiting'
+                    'status': p.status, // todo
+                    'info': p.info
                 };
                 console.log(JSON.stringify(body));
                 const transactions = ['createMovement'];
@@ -111,6 +113,30 @@ const init = async () => {
                         reject(err);
                     });
             });
+        }
+    });
+
+
+    server.route({
+       method: 'POST',
+       path: '/update_animal_field',
+        handler: (req, h) => {
+           return new Promise((resolve, reject) => {
+               const p = req.payload || {};
+               const userId = p.firstFarmerId;
+               const body = p;
+               console.log(JSON.stringify(body));
+               const transactions = ['createAnimal'];
+               const tasks = transactions.map((x) => submitTransaction(userId, x, [JSON.stringify(body)]));
+               return Promise.all(tasks)
+                   .then((res) => {
+                       resolve(res);
+                   })
+                   .catch((err) => {
+                       console.log(err);
+                       reject(err);
+                   });
+           })
         }
     });
 

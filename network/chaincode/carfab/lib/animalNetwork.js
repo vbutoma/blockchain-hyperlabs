@@ -84,7 +84,7 @@ class AnimalNetwork extends Contract {
             const number = `${type}_${params['id']}`;
             ctx.stub.putState(number, Buffer.from(JSON.stringify(params)))
                 .then((id) => {
-                    console.info('New object created', id, params);
+                    console.info('New object created', number, id, params);
                     return resolve()
                 })
                 .catch((err) => {
@@ -117,6 +117,7 @@ class AnimalNetwork extends Contract {
     }
 
     async createMovement(ctx, movement) {
+
         return this.createObjectByParams(ctx, 'movement', movement);
     }
 
@@ -236,7 +237,7 @@ class AnimalNetwork extends Contract {
             if (res.done) break;
         }
         await iterator.close();
-        console.log()
+        console.log(results);
         results = results.filter((item) => (item.Record.firstFarmerId === userId ||
             item.Record.secondFarmerId === userId || item.Record.regulatorId === userId));
         return JSON.stringify(results);
